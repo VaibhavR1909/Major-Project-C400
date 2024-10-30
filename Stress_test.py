@@ -4,7 +4,7 @@ import mysql.connector
 from mysql.connector import Error
 import threading
 import time
-
+# This is a change
 # Set up logging configuration
 logging.basicConfig(
     filename='stress_test.log',  # Log output file
