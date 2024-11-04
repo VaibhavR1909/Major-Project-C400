@@ -2,51 +2,61 @@ import os
 import logging
 import mysql.connector
 from mysql.connector import Error
-import threading
+from dotenv import load_dotenv
 import time
-# This is a change
-# Set up logging configuration
+import subprocess
+
+load_dotenv()
+
 logging.basicConfig(
-    filename='stress_test.log',  # Log output file
-    level=logging.INFO,           # Logging level (INFO, DEBUG, WARNING, ERROR, CRITICAL)
-    format='%(asctime)s - %(levelname)s - %(message)s',  # Log message format
-    datefmt='%Y-%m-%d %H:%M:%S'  # Date format
+    filename='stress_test.log',
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
 )
 
-# Stress Test Functions
 def memory_stress():
-    logging.info("Starting memory stress test...")
-    os.system("stress-ng --vm 1 --vm-bytes 80% -t 60s")
-    logging.info("Memory stress test completed.")
+    try:
+        logging.info("Starting memory stress test...")
+        os.system("stress-ng --vm 1 --vm-bytes 80% -t 60s")
+        logging.info("Memory stress test completed.")
+    except Exception as e:
+        logging.error(f"Memory stress test failed: {e}")
 
 def disk_stress():
-    logging.info("Starting disk stress test...")
-    os.system("stress-ng --hdd 1 --hdd-bytes 80% -t 60s")
-    logging.info("Disk stress test completed.")
+    try:
+        logging.info("Starting disk stress test...")
+        os.system("stress-ng --hdd 1 --hdd-bytes 80% -t 60s")
+        logging.info("Disk stress test completed.")
+    except Exception as e:
+        logging.error(f"Disk stress test failed: {e}")
 
 def network_stress():
-    logging.info("Starting network stress test...")
-    os.system("iperf3 -c 192.168.0.116")  # Replace with an actual target IP
-    logging.info("Network stress test completed.")
+    try:
+        logging.info("Starting network stress test...")
+        os.system("iperf3 -c 192.168.0.116")
+        logging.info("Network stress test completed.")
+    except Exception as e:
+        logging.error(f"Network stress test failed: {e}")
 
 def cpu_stress():
-    logging.info("Starting CPU stress test...")
-    os.system("stress-ng --cpu 1 --cpu-load 5 --cpu-method matrixprod -t 60s")
-    logging.info("CPU stress test completed.")
+    try:
+        logging.info("Starting CPU stress test...")
+        os.system("stress-ng --cpu 1 --cpu-load 5 --cpu-method matrixprod -t 60s")
+        logging.info("CPU stress test completed.")
+    except Exception as e:
+        logging.error(f"CPU stress test failed: {e}")
 
 def mysql_stress():
-#    logging.info("Starting MySQL stress test...")
- #   os.system("mysqlslap --concurrency=10 --iterations=80 --number-int-cols=2 --auto-generate-sql --number-of-queries=100 --host=192.168.0.116 --user=exporter1 --password=Vaibhav@1909")
-  #  logging.info("MySQL stress test completed.")
     try:
+        logging.info("Starting MySQL stress test...")
         connection = mysql.connector.connect(
-            host='192.168.0.116',
-            database='testdb',
-            user='exporter1',
-            password='Vaibhav@1909'
+            host=os.getenv('DB_HOST'),
+            database=os.getenv('DB_NAME'),
+            user=os.getenv('DB_USER'),
+            password=os.getenv('DB_PASSWORD')
         )
         cursor = connection.cursor()
-
 
         start_time = time.time()
         query_count = 0
@@ -59,15 +69,15 @@ def mysql_stress():
 
         elapsed_time = time.time() - start_time
         qps = query_count / elapsed_time
-        print(f"MySQL QPS stress test completed. Approximate QPS: {qps:.2f}")
+        logging.info(f"MySQL QPS stress test completed. Approximate QPS: {qps:.2f}")
 
     except Error as e:
-        print("Error during MySQL QPS stress test:", e)
+        logging.error(f"Error during MySQL QPS stress test: {e}")
     finally:
         if connection.is_connected():
             cursor.close()
             connection.close()
-
+            logging.info("MySQL connection closed after stress test.")
 
 def show_menu():
     while True:
@@ -108,3 +118,4 @@ if __name__ == "__main__":
     logging.info("Starting the Stress Test Script")
     show_menu()
     logging.info("Stress Test Script Ended")
+    subprocess.Popen(['python3', 'gemini.py'])
