@@ -1,0 +1,22 @@
+pipeline {
+    	agent any
+    	triggers {
+        	// GitHub webhook triggers the pipeline on every commit
+        	githubPush()
+    	}
+    	stages {
+        	stage('Clone Repository') {
+            	steps {
+                	// Change to the correct branch name, e.g., 'main' or 'master'
+                	git branch: 'main', url: 'https://github.com/VaibhavR1909/Major_Project_C400.git'
+            	}
+        	}
+        	stage('Copying to VM') {
+            	steps {
+                	sh """
+                	scp -i /var/lib/jenkins/mykey /var/lib/jenkins/workspace/major/stress.py root@192.168.29.49:/root
+                	"""
+            	}
+        	}
+    	}
+	}
