@@ -1,0 +1,93 @@
+- name: Setup Prometheus, Grafana, Alertmanager on vm_0
+  hosts: vm_0
+  become: true
+  tasks:
+	- name: Install Prometheus
+  	yum:
+    	name: prometheus
+    	state: present
+
+	- name: Install Grafana
+  	yum:
+    	name: grafana
+    	state: present
+
+	- name: Install Alertmanager
+  	yum:
+    	name: alertmanager
+    	state: present
+
+	- name: Start and enable Prometheus
+  	systemd:
+    	name: prometheus
+    	state: started
+    	enabled: yes
+
+	- name: Start and enable Grafana
+  	systemd:
+    	name: grafana-server
+    	state: started
+    	enabled: yes
+
+	- name: Start and enable Alertmanager
+  	systemd:
+    	name: alertmanager
+    	state: started
+    	enabled: yes
+
+- name: Setup Node Exporter, MySQL Exporter, and Python on vm_1
+  hosts: vm_1
+  become: true
+  tasks:
+	- name: Install Node Exporter
+  	yum:
+    	name: node_exporter
+    	state: present
+
+	- name: Install MySQL Exporter
+  	yum:
+    	name: mysqld_exporter
+    	state: present
+
+	- name: Install Python
+  	yum:
+    	name: python3
+    	state: present
+
+	- name: Start and enable Node Exporter
+  	systemd:
+    	name: node_exporter
+    	state: started
+    	enabled: yes
+
+	- name: Start and enable MySQL Exporter
+  	systemd:
+    	name: mysqld_exporter
+    	state: started
+    	enabled: yes
+
+- name: Setup MySQL Server and Jenkins on vm_2
+  hosts: vm_2
+  become: true
+  tasks:
+	- name: Install MySQL Server
+  	yum:
+    	name: mysql-server
+    	state: present
+
+	- name: Install Jenkins
+  	yum:
+    	name: jenkins
+    	state: present
+
+	- name: Start and enable MySQL Server
+  	systemd:
+    	name: mysqld
+    	state: started
+    	enabled: yes
+
+	- name: Start and enable Jenkins
+  	systemd:
+    	name: jenkins
+    	state: started
+    	enabled: ye
